@@ -15,6 +15,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if(APPLE)
     message(STATUS "Building TweakXL for macOS")
     add_compile_definitions(RED4EXT_PLATFORM_MACOS)
+    # R30: the mac-v1 branch builds for jackmaxwil's RED4ext-macos loader (natives through the RTTI register callbacks, no Frida script).
+    add_compile_definitions(CP2077_MAC_V1=1)
     add_compile_definitions(RED4EXT_USE_FRIDA_GADGET)
     set(CMAKE_OSX_ARCHITECTURES "arm64")
     set(OUTPUT_NAME "TweakXL")

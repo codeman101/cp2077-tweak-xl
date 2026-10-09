@@ -4,6 +4,7 @@
 #include "Core/Facades/Runtime.hpp"
 #if defined(__APPLE__)
 #include "Support/macOS/MacExit.hpp"
+#include "Support/macOS/MacV1Natives.hpp"
 #include <spdlog/spdlog.h>
 #endif
 #include <iostream>
@@ -65,6 +66,9 @@ RED4EXT_C_EXPORT bool RED4EXT_CALL Main(RED4ext::v1::PluginHandle aHandle, RED4e
             BootTrace("Application created, calling Bootstrap...");
             g_app->Bootstrap();
             BootTrace("Bootstrap complete");
+#if defined(CP2077_MAC_V1)
+            Mac::V1::AddNativeRegistrationCallback("TweakXL");
+#endif
             break;
         }
         case RED4ext::v1::EMainReason::Unload:
