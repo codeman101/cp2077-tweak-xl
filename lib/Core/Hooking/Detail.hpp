@@ -1,6 +1,9 @@
 #pragma once
 
 #include "Core/Hooking/HookingDriver.hpp"
+#if defined(__APPLE__)
+#include "Core/Hooking/HookHits.hpp"
+#endif
 #include "Core/Stl.hpp"
 
 namespace Core
@@ -286,6 +289,10 @@ public:
             reinterpret_cast<void*>(s_handler),
             reinterpret_cast<void**>(aOriginal));
         s_original = *aOriginal;
+#if defined(__APPLE__)
+        if (s_attached)
+            Core::HookHits::Attached(s_address, reinterpret_cast<const void*>(s_handler));
+#endif
 
         if (!s_attached)
         {
@@ -375,6 +382,9 @@ public:
 
     inline static TRet Handle(TArgs... aArgs)
     {
+#if defined(__APPLE__)
+        Core::HookHits::Bump(s_hits, reinterpret_cast<const void*>(&Handle));
+#endif
         if constexpr (std::is_void_v<TRet>)
         {
             if constexpr (TFlow == HookFlow::Original)
@@ -537,6 +547,9 @@ public:
 
 private:
     static inline Wrapper s_callback;
+#if defined(__APPLE__)
+    static inline std::atomic<uint64_t> s_hits{0};
+#endif
     static inline Original s_original;
 };
 }

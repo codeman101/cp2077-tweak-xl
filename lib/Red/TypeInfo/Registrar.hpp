@@ -1,5 +1,8 @@
 #pragma once
 
+#include <cstdio>
+#include <cstdlib>
+
 namespace Red
 {
 class TypeInfoRegistrar
@@ -17,6 +20,25 @@ public:
     {
         QueuePendingRegisterCallbacks();
         QueuePendingDescribeCallbacks();
+    }
+
+    // Run the queued RedLib callbacks on this thread. macOS calls this once from
+    // tweakxl_registerNatives at InitScripts, because the game does not call them.
+    // Does not queue them onto CRTTISystem, so OnBootstrap stays unused.
+    static inline void RunPending()
+    {
+        ProcessPendingRegisterCallbacks();
+        ProcessPendingDescriberCallbacks();
+    }
+
+    static inline std::size_t PendingRegisterCount()
+    {
+        return s_registerCallbacks.size();
+    }
+
+    static inline std::size_t PendingDescribeCount()
+    {
+        return s_describeCallbacks.size();
     }
 
     static inline void AddRegisterCallback(Callback aRegister)
@@ -72,12 +94,20 @@ private:
 
     static inline void OnRegister()
     {
+#if defined(__APPLE__)
+        // R8 diagnostics (TWEAKXL_MAC_DIAG=1 only).
+        if (std::getenv("TWEAKXL_MAC_DIAG") && std::getenv("TWEAKXL_MAC_DIAG")[0] == '1') std::fprintf(stderr, "[RedLib] OnRegister %zu\n", s_registerCallbacks.size());
+#endif
         ProcessPendingRegisterCallbacks();
         QueuePendingRegisterCallbacks();
     }
 
     static inline void OnDescribe()
     {
+#if defined(__APPLE__)
+        // R8 diagnostics (TWEAKXL_MAC_DIAG=1 only).
+        if (std::getenv("TWEAKXL_MAC_DIAG") && std::getenv("TWEAKXL_MAC_DIAG")[0] == '1') std::fprintf(stderr, "[RedLib] OnDescribe %zu\n", s_describeCallbacks.size());
+#endif
         ProcessPendingDescriberCallbacks();
         QueuePendingDescribeCallbacks();
     }

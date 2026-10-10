@@ -4,6 +4,7 @@
 #include "Core/Hooking/HookingDriver.hpp"
 #include "Core/Logging/LoggingDriver.hpp"
 #include "Core/Memory/AddressResolver.hpp"
+#include "Support/RED4ext/V1Compat.hpp"
 
 namespace Support
 {
@@ -48,7 +49,17 @@ public:
 
     auto RegisterScripts(const std::filesystem::path& aPath) noexcept
     {
+#if defined(_WIN32) || defined(_WIN64)
         m_sdk->scripts->Add(m_plugin, aPath.c_str());
+#else
+        // macOS: Avoid UB from iterators into different temporaries.
+        // Also avoid throwing conversions for non-ASCII paths by using the filesystem-native wide string.
+        if (m_sdk && m_sdk->scripts && m_sdk->scripts->Add)
+        {
+            const std::wstring widePath = aPath.wstring();
+            m_sdk->scripts->Add(m_plugin, widePath.c_str());
+        }
+#endif
         return Defer(this);
     }
 

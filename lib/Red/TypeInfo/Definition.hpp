@@ -12,6 +12,18 @@
 
 namespace Red
 {
+namespace Detail
+{
+// The instance arguments of the type virtuals: the Mac SDK spells them ScriptInstance (void*), the Windows SDK pin const void* / void*.
+#if defined(__APPLE__)
+using InstancePtr = ScriptInstance;
+using ConstInstancePtr = const ScriptInstance;
+#else
+using InstancePtr = void*;
+using ConstInstancePtr = const void*;
+#endif
+}
+
 template<Scope>
 struct TypeInfoBuilder;
 
@@ -667,7 +679,7 @@ public:
 template<typename TClass>
 class ClassDescriptorDefaultImpl : public ClassDescriptor<TClass>
 {
-    const bool IsEqual(const void* aLhs, const void* aRhs, uint32_t a3) final // 48
+    const bool IsEqual(Detail::ConstInstancePtr aLhs, Detail::ConstInstancePtr aRhs, uint32_t a3) final // 48
     {
         if constexpr (Detail::IsConstructionForwarded<TClass>)
         {
@@ -679,7 +691,7 @@ class ClassDescriptorDefaultImpl : public ClassDescriptor<TClass>
         }
         else
         {
-            using func_t = bool (*)(CClass*, const void*, const void*, uint32_t);
+            using func_t = bool (*)(CClass*, Detail::ConstInstancePtr, Detail::ConstInstancePtr, uint32_t);
 #if defined(RED4EXT_V1_SDK_VERSION_CURRENT) || defined(RED4EXT_SDK_0_5_0)
             static UniversalRelocFunc<func_t> func(RED4ext::Detail::AddressHashes::TTypedClass_IsEqual);
 #else
@@ -689,7 +701,7 @@ class ClassDescriptorDefaultImpl : public ClassDescriptor<TClass>
         }
     }
 
-    void Assign(void* aLhs, const void* aRhs) const final // 50
+    void Assign(Detail::InstancePtr aLhs, Detail::ConstInstancePtr aRhs) const final // 50
     {
         if constexpr (Detail::IsConstructionForwarded<TClass>)
         {
@@ -725,7 +737,7 @@ class ClassDescriptorDefaultImpl : public ClassDescriptor<TClass>
         }
     }
 
-    void ConstructCls(void* aMemory) const final // D8
+    void ConstructCls(Detail::InstancePtr aMemory) const final // D8
     {
         if constexpr (Detail::IsConstructionForwarded<TClass>)
         {
@@ -740,7 +752,7 @@ class ClassDescriptorDefaultImpl : public ClassDescriptor<TClass>
         }
     }
 
-    void DestructCls(void* aMemory) const final // E0
+    void DestructCls(Detail::InstancePtr aMemory) const final // E0
     {
         if constexpr (Detail::IsConstructionForwarded<TClass>)
         {

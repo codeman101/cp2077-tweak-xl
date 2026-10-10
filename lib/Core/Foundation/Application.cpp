@@ -1,12 +1,45 @@
 #include "Application.hpp"
+#include <iostream>
+#include <cstdlib>
+
+namespace
+{
+bool IsBootTraceEnabled()
+{
+    static const bool enabled = []() {
+        const char* value = std::getenv("TWEAKXL_BOOT_TRACE");
+        const char* diag = std::getenv("TWEAKXL_MAC_DIAG");
+        return (value && value[0] != '\0' && value[0] != '0') || (diag && diag[0] == '1');
+    }();
+    return enabled;
+}
+
+void BootTrace(const char* aMessage)
+{
+    if (IsBootTraceEnabled())
+    {
+        std::cerr << "[Core::Application] " << aMessage << std::endl;
+    }
+}
+}
 
 void Core::Application::Bootstrap()
 {
+    BootTrace("Bootstrap starting...");
+    
     if (m_booted)
+    {
+        BootTrace("Already booted, returning");
         return;
+    }
 
     if (!s_discoveryCallbacks.empty())
     {
+        if (IsBootTraceEnabled())
+        {
+            std::cerr << "[Core::Application] Processing " << s_discoveryCallbacks.size() << " discovery callbacks"
+                      << std::endl;
+        }
         for (const auto& callback : s_discoveryCallbacks)
         {
             callback(*this);
@@ -16,14 +49,27 @@ void Core::Application::Bootstrap()
 
     m_booted = true;
 
+    BootTrace("Calling OnStarting...");
     OnStarting();
 
+    if (IsBootTraceEnabled())
+    {
+        std::cerr << "[Core::Application] Bootstrapping " << GetRegistered().size() << " features..." << std::endl;
+    }
+    int featureIdx = 0;
     for (const auto& feature : GetRegistered())
     {
+        if (IsBootTraceEnabled())
+        {
+            std::cerr << "[Core::Application] Bootstrapping feature #" << featureIdx++ << std::endl;
+        }
         feature->OnBootstrap();
     }
 
+    BootTrace("Calling OnStarted...");
     OnStarted();
+    
+    BootTrace("Bootstrap complete");
 }
 
 void Core::Application::Shutdown()
