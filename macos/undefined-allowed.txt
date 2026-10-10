@@ -1,0 +1,1 @@
+# TweakXL symbols that are declared, referenced and not compiled in. One demangled name per line. check-undefined.sh fails the build for any other.
