@@ -1,5 +1,9 @@
 #pragma once
 
+#if defined(__APPLE__)
+#include "MacDiag.hpp"
+#endif
+
 #include "App/Tweaks/Batch/TweakChangelog.hpp"
 #include "Core/Logging/LoggingAgent.hpp"
 #include "Red/TweakDB/Manager.hpp"
@@ -105,9 +109,31 @@ private:
     void StartAsyncCommitJob(J&& aJob)
     {
         StartCommitJob();
+#if defined(__APPLE__)
+        // R23. The job runtime is mapped (the R18 rows, macos/MacSdkRows.inc) and the chunk runs on the job queue like on Windows: the closure is a
+        // plain heap object the queue frees and nothing waits. TWEAKXL_MAC_ASYNC_COMMIT=0 keeps the old synchronous behaviour.
+        if (Mac::AsyncCommitEnabled())
+        {
+            Red::JobQueue jobQueue;
+            jobQueue.Dispatch([self = ToShared(), job = std::forward<J>(aJob)]() mutable {
+                MAC_DIAG("[selftest] async commit: chunk running on a job thread\n");
+                job();
+            });
+            jobQueue.Dispatch([self = ToShared()] {
+                self->FinishCommitJob();
+                MAC_DIAG("[selftest] async commit: chunk finished\n");
+            });
+        }
+        else
+        {
+            std::forward<J>(aJob)();
+            FinishCommitJob();
+        }
+#else
         Red::JobQueue jobQueue;
         jobQueue.Dispatch(std::forward<J>(aJob));
         jobQueue.Dispatch([self = ToShared()]{ self->FinishCommitJob(); });
+#endif
     }
 
     static int32_t FindElement(const Red::CRTTIArrayType* aArrayType, void* aArray, void* aValue);

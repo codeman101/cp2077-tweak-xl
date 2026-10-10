@@ -42,6 +42,9 @@ public:
 
 protected:
     void OnBootstrap() override;
+#if defined(__APPLE__)
+    void OnShutdown() override;
+#endif
     void CreateTweaksDir();
     void EnsureRuntimeAccess();
     void ApplyPatches();

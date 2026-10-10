@@ -245,7 +245,7 @@ const Red::CClass* Red::TweakDBManager::GetRecordType(const Red::TweakDBManager:
         const auto it = aBatch->records.find(aRecordId);
 
         if (it != aBatch->records.end())
-            recordType = it.value()->type;
+            recordType = it->second->type;
     }
 
     return recordType;
@@ -647,7 +647,7 @@ void Red::TweakDBManager::CreateExtraNames(Red::TweakDBID aId, const std::string
 
     for (const auto& [propKey, propInfo] : recordInfo->props)
     {
-        const auto propId = aId + propInfo->appendix;
+        auto propId = aId + propInfo->appendix;
         const auto propName = aName + propInfo->appendix;
 
         auto it = m_knownNames.find(propId);

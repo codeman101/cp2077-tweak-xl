@@ -14,9 +14,16 @@ class StatService
 {
 protected:
     void OnBootstrap() override;
+#if defined(__APPLE__)
+    void OnShutdown() override;
+#endif
 
     static void OnInitializeStats(void* aSystem);
+#if defined(__APPLE__)
+    static Red::StatRange OnGetStatRange(void* aSystem, uint32_t aStat);
+#else
     static uint64_t* OnGetStatRange(void* aSystem, uint64_t* aRange, uint32_t aStat);
+#endif
     static uint32_t OnGetStatFlags(void* aSystem, uint32_t aStat);
     static bool OnCheckStatFlag(void* aSystem, uint32_t aStat, uint32_t aFlag);
 

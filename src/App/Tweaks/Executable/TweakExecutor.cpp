@@ -1,4 +1,7 @@
 #include "TweakExecutor.hpp"
+#if defined(__APPLE__)
+#include "MacDiag.hpp"
+#endif
 #include "App/Tweaks/Executable/Scriptable/ScriptInterface.hpp"
 #include "App/Tweaks/Executable/Scriptable/ScriptManager.hpp"
 #include "App/Tweaks/Executable/Scriptable/ScriptableTweak.hpp"
@@ -27,8 +30,52 @@ void App::TweakExecutor::ExecuteTweaks()
 {
     try
     {
+        // R25. GetClasses with a null base returns every class, which would run every class as a tweak when ScriptableTweak is not
+        // registered (its scripts failed to load). Without the base there is nothing to run.
+        // Fix found in jackmaxwil/cp2077-tweak-xl-macos src/App/Tweaks/Executable/TweakExecutor.cpp, MIT.
+        Red::CClass* tweakBase = s_scriptableTweakType;
+        if (!tweakBase)
+        {
+            LogError("ScriptableTweak is not registered, scriptable tweaks are disabled.");
+            return;
+        }
+
         Red::DynArray<Red::CClass*> tweakClasses;
-        m_rtti->GetClasses(s_scriptableTweakType, tweakClasses);
+        m_rtti->GetClasses(tweakBase, tweakClasses);
+
+#if defined(__APPLE__)
+        // R8 diagnostics (TWEAKXL_MAC_DIAG=1 only): the scriptable tweak classes the RTTI system hands out.
+        if (Mac::DiagEnabled())
+        {
+            // R25 self-test: the reason for the null guard above. GetClasses with a null base hands out the whole class table.
+            Red::DynArray<Red::CClass*> allClasses;
+            m_rtti->GetClasses(nullptr, allClasses);
+            MAC_DIAG("[selftest] R25 GetClasses(null base) returns %u classes, GetClasses(ScriptableTweak) returns %u (%s)\n",
+                     allClasses.size, tweakClasses.size, allClasses.size > 1000 && allClasses.size > tweakClasses.size ? "PASS" : "FAIL");
+            Red::CClass* base = s_scriptableTweakType;
+            const auto expected = Red::CName("ScriptableTweak").hash;
+            LogInfo("[diag] base ptr={} name={:x} expected={:x} isAbstract={} funcs={} count={}",
+                    static_cast<void*>(base),
+                    base ? base->name.hash : 0,
+                    expected,
+                    base ? static_cast<uint32_t>(base->flags.isAbstract) : 0u,
+                    base ? base->funcs.size : 0u,
+                    tweakClasses.size);
+            for (auto* tweakClass : tweakClasses)
+            {
+                const auto* parent = tweakClass ? tweakClass->parent : nullptr;
+                LogInfo("[diag] class ptr={} name={:x} isAbstract={} isNative={} parent={} parentName={:x} funcs={} props={}",
+                        static_cast<void*>(tweakClass),
+                        tweakClass ? tweakClass->name.hash : 0,
+                        tweakClass ? static_cast<uint32_t>(tweakClass->flags.isAbstract) : 0u,
+                        tweakClass ? static_cast<uint32_t>(tweakClass->flags.isNative) : 0u,
+                        static_cast<const void*>(parent),
+                        parent ? parent->name.hash : 0,
+                        tweakClass ? tweakClass->funcs.size : 0u,
+                        tweakClass ? tweakClass->props.size : 0u);
+            }
+        }
+#endif
 
         if (tweakClasses.IsEmpty())
             return;

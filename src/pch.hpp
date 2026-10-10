@@ -19,6 +19,9 @@
 #include <vector>
 
 #include <RED4ext/RED4ext.hpp>
+#if defined(__APPLE__)
+#include "Support/RED4ext/V1Compat.hpp" // the v1 API names of RED4ext.SDK 1.0 on the Mac SDK port
+#endif
 
 #include <RED4ext/Relocation.hpp>
 #include <RED4ext/ResourceDepot.hpp>

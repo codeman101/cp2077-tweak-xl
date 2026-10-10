@@ -20,7 +20,16 @@ constexpr auto CreateRecord = Core::RawFunc<
     /* addr = */ Red::AddressLib::TweakDB_CreateRecord,
     /* type = */ void (*)(Red::TweakDB*, uint32_t, Red::TweakDBID)>();
 
+#if defined(__APPLE__)
+// Windows Derive is crc32(name, base.hash) and length = base.length + len.
+// 0x2B7D228 is the blob reader, not this function. Nothing else is in the body.
+inline void CreateTweakDBID(const Red::TweakDBID* aBase, Red::TweakDBID* aOut, const char* aName)
+{
+    *aOut = Red::TweakDBID(*aBase, aName ? aName : "");
+}
+#else
 constexpr auto CreateTweakDBID = Core::RawFunc<
     /* addr = */ Red::AddressLib::TweakDBID_Derive,
     /* type = */ void (*)(const Red::TweakDBID*, const Red::TweakDBID*, const char*)>();
+#endif
 }
