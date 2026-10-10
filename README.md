@@ -22,6 +22,10 @@ containing essential information about game entities and behavior.
    - [RED4ext](https://docs.red4ext.com/getting-started/installing-red4ext) 1.28.0+
 2. Extract the release archive `TweakXL-x.x.x.zip` into the Cyberpunk 2077 directory.
 
+## macOS (Apple Silicon)
+
+A native macOS build of this plugin lives in this fork. How to build and run it, what works and the known gaps: [macos/README.md](macos/README.md).
+
 ## Documentation
 
 - [TweakDB](https://github.com/psiberx/cp2077-tweak-xl/wiki/TweakDB)

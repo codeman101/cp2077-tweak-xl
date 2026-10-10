@@ -1,0 +1,9 @@
+# Image-relative offsets TweakXL hooks (RED4EXT_GUM_HOOK_OFFSETS allowlist entries). One per line; # starts a comment.
+# RED4ext-macos installs a detour only for an offset on the allowlist; any other Attach reports success and does nothing.
+# The three stat getters are installed lazily, only when a tweak adds a custom stat type.
+0x2b7cc9c  # TweakDB_TryLoad
+0x35f1bac  # TweakDB_Init
+0x3a939a0  # StatsDataSystem_InitializeRecords
+0x3a93e74  # StatsDataSystem_CheckStatFlag (lazy)
+0x3a93ef0  # StatsDataSystem_GetStatFlags (lazy)
+0x3a9472c  # StatsDataSystem_GetStatRange (lazy)
