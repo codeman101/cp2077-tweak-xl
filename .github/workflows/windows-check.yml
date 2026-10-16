@@ -1,0 +1,26 @@
+# CI-ONLY trigger file for a fork branch. Do not include in the PR. Not run yet.
+name: windows-check
+on:
+  push:
+    branches: ['**']
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Support header, MSVC syntax check
+        shell: cmd
+        run: |
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          echo #include ^<RED4ext/RED4ext.hpp^> > t.cpp
+          echo #include "support/red4ext/TweakXL.hpp" >> t.cpp
+          echo void f() { TweakXL::RegisterTweak(std::filesystem::path("a.yaml")); } >> t.cpp
+          cl /nologo /std:c++20 /EHsc /Zs /DNOMINMAX /DWIN32_LEAN_AND_MEAN /Ivendor\RED4ext.SDK\include /I. t.cpp
+      - uses: xmake-io/github-action-setup-xmake@v1
+      - name: Plugin build (unchanged by this PR)
+        run: |
+          xmake f -m release -y
+          xmake build -y
