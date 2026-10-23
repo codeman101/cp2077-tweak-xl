@@ -58,16 +58,21 @@ void TweakXLAddressResolver::InitializeAddressTable()
     // TweakDB_Init (hash: 3062572522). Calls GetTweakDB, then LoadOptimized.
     // 0x2B79AC0 is a script native.
     m_addressTable[3062572522] = 0x1EF64C8;
+    m_addressTable[4053739225] = 0x1EF64C8; // 2.5 hash (psiberx/cp2077-tweak-xl#22), same function
     
     // TweakDB_Load (hash: 3602585178 = 0xD6B1DB5A)
     // Opens tweakdb_ep1.bin. Two args: TweakDB* in x0, path in x1.
     // Old NCC value 0x2B7BE94 is not on that backtrace.
     m_addressTable[3602585178] = 0x37CE05C;
+    // 2.5 hash (PR #22). Mac 2.5 signature: x0 TweakDB*, w1 bool (Init passes 1), x2 path.
+    m_addressTable[63182599] = 0x37CE05C;
     
     // TweakDB_TryLoad (hash: 3512345737 = 0xD16A2999)
     // 4-arg bool. x1 is the TweakDB, x2 is the path. On the open backtrace
     // of r6/cache/tweakdb_ep1.bin. Old NCC value 0x2B7BAB0 is never called.
     m_addressTable[3512345737] = 0x37D60CC;
+    // 2.5 hash (PR #22). Mac 2.5 signature: x0 a1, x1 TweakDB*, x2 path, x3 blob, w4 bool (5th arg, a register on arm64).
+    m_addressTable[464332086] = 0x37D60CC;
     
     // TweakDB_CreateRecord (hash: 838931066). game::data::AddRecord.
     // 0x2B737AC registers the TweakDBRecord RTTI class.
