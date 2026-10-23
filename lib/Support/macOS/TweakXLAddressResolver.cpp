@@ -57,27 +57,27 @@ void TweakXLAddressResolver::InitializeAddressTable()
     
     // TweakDB_Init (hash: 3062572522). Calls GetTweakDB, then LoadOptimized.
     // 0x2B79AC0 is a script native.
-    m_addressTable[3062572522] = 0x35F1BAC;
+    m_addressTable[3062572522] = 0x1EF64C8;
     
     // TweakDB_Load (hash: 3602585178 = 0xD6B1DB5A)
     // Opens tweakdb_ep1.bin. Two args: TweakDB* in x0, path in x1.
     // Old NCC value 0x2B7BE94 is not on that backtrace.
-    m_addressTable[3602585178] = 0x2B75570;
+    m_addressTable[3602585178] = 0x37CE05C;
     
     // TweakDB_TryLoad (hash: 3512345737 = 0xD16A2999)
     // 4-arg bool. x1 is the TweakDB, x2 is the path. On the open backtrace
     // of r6/cache/tweakdb_ep1.bin. Old NCC value 0x2B7BAB0 is never called.
-    m_addressTable[3512345737] = 0x2B7CC9C;
+    m_addressTable[3512345737] = 0x37D60CC;
     
     // TweakDB_CreateRecord (hash: 838931066). game::data::AddRecord.
     // 0x2B737AC registers the TweakDBRecord RTTI class.
-    m_addressTable[838931066] = 0x26B8DB8;
+    m_addressTable[838931066] = 0x3309CC4;
 
     // TweakDB_Get (hash: 914361828).
-    m_addressTable[914361828] = 0x2B73C7C;
+    m_addressTable[914361828] = 0x37CC900;
 
     // CRTTISystem_Get. Same function the probe uses.
-    m_addressTable[1247874916] = 0x2188E8C;
+    m_addressTable[1247874916] = 0x10B3CAC;
 
     // CString and DynArray. Real Mac bodies, not local stand-ins.
     m_addressTable[3357477547] = 0x2CDB8;
@@ -87,47 +87,47 @@ void TweakXLAddressResolver::InitializeAddressTable()
     m_addressTable[2057311186] = 0x286E8;
 
     // CNamePool. AddCString is implemented as Add(c_str()).
-    m_addressTable[1759447004] = 0x3452D7C;
-    m_addressTable[10488987] = 0x3452DDC;
-    m_addressTable[3649309656] = 0x3452DA0;
+    m_addressTable[1759447004] = 0x4E38940;
+    m_addressTable[10488987] = 0x4E389D0;
+    m_addressTable[3649309656] = 0x4E38978;
 
     // Handle_DecWeakRef (hash: 859509764). void(SharedPtrBase*). Identical copy at 0x914668.
-    m_addressTable[859509764] = 0x21048C4;
+    m_addressTable[859509764] = 0x1025DC8;
     // ResourceDepot (hash: 1704595399). Global ResourceDepot* (data, not code). Accessor 0x21C6820.
-    m_addressTable[1704595399] = 0x7D6C538;
-    m_addressTable[1518341917] = 0x2197AAC;  // CClass_CreateInstance (rtti::ClassType::CreateObject)
-    m_addressTable[404169501] = 0x2173120;   // CBaseFunction_InternalExecute
-    m_addressTable[882511585] = 0x6FFAEA0;   // CStack_vtbl (data: vptr value, slot 0)
-    m_addressTable[3791200470] = 0x2172BF4;  // CBaseFunction_ExecuteScripted (Gate 5 path)
-    m_addressTable[3121353053] = 0x2104788;  // Handle_ctor (Gate 5 path)
-    m_addressTable[961751128] = 0x908B798;   // OpcodeHandlers (data: handler table; Gate 5 path)
-    m_addressTable[2920426135] = 0x2173864;  // CClassStaticFunction_ctor
-    m_addressTable[1613572595] = 0x2173760;  // CClassFunction_ctor (Mac pointer-to-member ABI)
-    m_addressTable[4201325776] = 0x21739E8;  // CGlobalFunction_ctor
+    m_addressTable[1704595399] = 0x805A7D8;
+    m_addressTable[1518341917] = 0x10C36A0;  // CClass_CreateInstance (rtti::ClassType::CreateObject)
+    m_addressTable[404169501] = 0x1099fbc;   // CBaseFunction_InternalExecute
+    m_addressTable[882511585] = 0x78300D8;   // CStack_vtbl (data: vptr value, slot 0)
+    m_addressTable[3791200470] = 0x1098FC0;  // CBaseFunction_ExecuteScripted (Gate 5 path)
+    m_addressTable[3121353053] = 0x1025c8c;  // Handle_ctor (Gate 5 path)
+    m_addressTable[961751128] = 0x9A5C940;   // OpcodeHandlers (data: handler table; Gate 5 path)
+    m_addressTable[2920426135] = 0x109b974;  // CClassStaticFunction_ctor
+    m_addressTable[1613572595] = 0x109b8a4;  // CClassFunction_ctor (Mac pointer-to-member ABI)
+    m_addressTable[4201325776] = 0x109BAA8;  // CGlobalFunction_ctor
     
     // StatsDataSystem_InitializeRecords (hash: 1299190886 = 0x4D6E8066)
     // DISCOVERED: Medium function at 0x3a939a0 that works with TweakDB records (offset 0xD8)
     // Matches initialization pattern for stat records
-    m_addressTable[1299190886] = 0x3A939A0;
+    m_addressTable[1299190886] = 0x23B2F68;
     
     // StatsDataSystem_InitializeParams (hash: 3652194890 = 0xD9B5924A)
     // DISCOVERED: Large function at 0x3a932a8 working with both records (0xD8) and params (0xE8)
     // Called to initialize stat parameter arrays
-    m_addressTable[3652194890] = 0x3A932A8;
+    m_addressTable[3652194890] = 0x23B29A0;
     
     // StatsDataSystem_GetStatRange (hash: 1444748215 = 0x5620D3B7). A virtual (Mac vtable slot 0x208).
     // Mac signature (R23, differs from Windows): {float min, float max} (*)(void* system, uint32_t stat), the two floats come back in s0:s1.
-    m_addressTable[1444748215] = 0x3A9472C;
+    m_addressTable[1444748215] = 0x23B3CB0;
     
     // StatsDataSystem_GetStatFlags (hash: 3123320294 = 0xBA1CE5E6)
     // DISCOVERED: Small function at 0x3a93ef0, returns W0 (32-bit flags)
     // Signature: uint32_t (*)(void*, uint32_t)
-    m_addressTable[3123320294] = 0x3A93EF0;
+    m_addressTable[3123320294] = 0x23B34B4;
     
     // StatsDataSystem_CheckStatFlag (hash: 2954893634 = 0xB01D2542)
     // DISCOVERED: Small function at 0x3a93e74 with comparison and conditional return
     // Signature: bool (*)(void*, uint32_t, uint32_t)
-    m_addressTable[2954893634] = 0x3A93E74;
+    m_addressTable[2954893634] = 0x23B3438;
     
     // =========================================================================
     // Additional SDK addresses that may be needed
