@@ -33,7 +33,7 @@ void App::TweakService::OnBootstrap()
 {
     CreateTweaksDir();
 
-    auto hookTryLoad = HookAfter<Raw::TryLoadTweakDB>([&](bool& aSuccess, void*, Red::TweakDB* aDb, Red::CString& aPath, void*) {
+    auto hookTryLoad = HookAfter<Raw::TryLoadTweakDB>([&](bool& aSuccess, void*, Red::TweakDB* aDb, Red::CString& aPath, void*, bool) {
         LogInfo("TryLoadTweakDB returned {} db={}.", aSuccess ? "true" : "false", static_cast<void*>(aDb));
         if (aSuccess && aDb)
         {
