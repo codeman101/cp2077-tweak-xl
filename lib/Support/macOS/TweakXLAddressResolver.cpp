@@ -53,7 +53,7 @@ void TweakXLAddressResolver::InitializeAddressTable()
     
     // Main function (hash: 240386859 = 0x0E54032B)
     // CONFIRMED: Entry point from Mach-O LC_MAIN
-    m_addressTable[240386859] = 0x31E18;
+    m_addressTable[240386859] = 0x323A0;
     
     // TweakDB_Init (hash: 3062572522). Calls GetTweakDB, then LoadOptimized.
     // 0x2B79AC0 is a script native.
@@ -80,11 +80,11 @@ void TweakXLAddressResolver::InitializeAddressTable()
     m_addressTable[1247874916] = 0x10B3CAC;
 
     // CString and DynArray. Real Mac bodies, not local stand-ins.
-    m_addressTable[3357477547] = 0x2CDB8;
-    m_addressTable[2065762423] = 0x2940C;
-    m_addressTable[3904113489] = 0x2AACC; // CString_copy: the copy assign (Windows 0x2503FC). R25: was the copy constructor 0x2B110.
-    m_addressTable[1409615660] = 0x29228;
-    m_addressTable[2057311186] = 0x286E8;
+    m_addressTable[3357477547] = 0x2CCAC;
+    m_addressTable[2065762423] = 0x2933C;
+    m_addressTable[3904113489] = 0x2AA74; // CString_copy: the copy assign (Windows 0x2503FC). R25: was the copy constructor 0x2B110.
+    m_addressTable[1409615660] = 0x2914C;
+    m_addressTable[2057311186] = 0x28674;
 
     // CNamePool. AddCString is implemented as Add(c_str()).
     m_addressTable[1759447004] = 0x4E38940;
