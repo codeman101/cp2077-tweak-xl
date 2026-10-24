@@ -427,16 +427,16 @@ void LogR9Class(const char* aName)
                  static_cast<void*>(cls),
                  static_cast<unsigned long long>(cls ? cls->name.hash : 0),
                  cls ? static_cast<unsigned>(cls->flags.isAbstract) : 0u,
-                 cls ? cls->funcs.size : 0u,
-                 cls ? cls->staticFuncs.size : 0u,
+                 cls ? cls->funcs.Size() : 0u,
+                 cls ? cls->staticFuncs.Size() : 0u,
                  static_cast<const void*>(parent),
                  static_cast<unsigned long long>(parent ? parent->name.hash : 0));
     if (!cls)
     {
         return;
     }
-    LogFuncList(aName, "methods", cls->funcs.size, [&](uint32_t i) { return cls->funcs[i]; });
-    LogFuncList(aName, "statics", cls->staticFuncs.size, [&](uint32_t i) { return cls->staticFuncs[i]; });
+    LogFuncList(aName, "methods", cls->funcs.Size(), [&](uint32_t i) { return cls->funcs[i]; });
+    LogFuncList(aName, "statics", cls->staticFuncs.Size(), [&](uint32_t i) { return cls->staticFuncs[i]; });
     GuardParent(aName, cls);
 }
 }

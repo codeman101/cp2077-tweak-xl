@@ -32,13 +32,13 @@ void SelfTestGetters(void* aSystem, uint32_t aStat, const std::string& aName)
 {
     std::thread([aSystem, aStat, aName]() {
         auto& statParams = Raw::StatsDataSystem::StatParams::Ref(aSystem);
-        for (int i = 0; i < 400 && statParams.size <= aStat; ++i)
+        for (int i = 0; i < 400 && statParams.Size() <= aStat; ++i)
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
-        if (statParams.size <= aStat)
+        if (statParams.Size() <= aStat)
         {
             MAC_DIAG("[selftest] stat getters %s FAIL: params array never reached stat %u (size %u)\n", aName.c_str(), aStat,
-                     statParams.size);
+                     statParams.Size());
             return;
         }
 
@@ -66,7 +66,7 @@ void SelfTestGetters(void* aSystem, uint32_t aStat, const std::string& aName)
         const auto base = getRange(aSystem, 1);
         const auto dummy = getRange(aSystem, BaseStatCount);
         const auto invalid = getRange(aSystem, InvalidStat);
-        const auto outside = getRange(aSystem, statParams.size + 100);
+        const auto outside = getRange(aSystem, statParams.Size() + 100);
         const bool boundsPass = base.min == statParams[1].min && base.max == statParams[1].max && invalid.min == 0.0f
                                 && invalid.max == 0.0f && outside.min == 0.0f && outside.max == 0.0f;
         MAC_DIAG("[selftest] stat getters bounds base(1)=(%g,%g) count=(%g,%g) invalid=(%g,%g) outside=(%g,%g) %s\n", base.min, base.max,
@@ -133,7 +133,7 @@ void App::StatService::OnInitializeStats(void* aSystem)
 {
 #if defined(__APPLE__)
     // Runs on a game job thread right after the original InitializeRecords filled the records array (StatType::Count entries).
-    MAC_DIAG("[stat] InitializeRecords finished, records.size=%u\n", Raw::StatsDataSystem::StatRecords::Ref(aSystem).size);
+    MAC_DIAG("[stat] InitializeRecords finished, records.size=%u\n", Raw::StatsDataSystem::StatRecords::Ref(aSystem).Size());
 #endif
     RegisterStats(aSystem, Core::Resolve<TweakService>()->GetChangelog().GetAffectedRecords());
     RegisterStats(aSystem, Core::Resolve<TweakService>()->GetManager().GetEnums());
@@ -219,7 +219,7 @@ void App::StatService::RegisterStats(void* aStatSystem, const Core::Set<Red::Twe
             Raw::StatRecord::EnumValue::Ref(record) = enumValue;
 #if defined(__APPLE__)
             LogInfo("StatService: custom stat type {} applied (enum value {}).", enumName, enumValue);
-            MAC_DIAG("[stat] custom stat %s: records.size=%u enumValue=%u readback=%u hasOption=%d\n", enumName, statRecords->size,
+            MAC_DIAG("[stat] custom stat %s: records.size=%u enumValue=%u readback=%u hasOption=%d\n", enumName, statRecords->Size(),
                      enumValue, static_cast<uint32_t>(Raw::StatRecord::EnumValue::Ref(record)),
                      statTypeEnum->HasOption(enumName) ? 1 : 0);
             if (Mac::DiagEnabled() && s_statTypesModified)
@@ -241,7 +241,7 @@ Red::StatRange App::StatService::OnGetStatRange(void* aSystem, uint32_t aStat)
         auto& statLock = Raw::StatsDataSystem::StatLock::Ref(aSystem);
 
         std::shared_lock _(statLock);
-        if (aStat < statParams.size)
+        if (aStat < statParams.Size())
         {
             const auto& params = statParams[aStat];
             if (aStat > InvalidStat && Mac::DiagEnabled() && s_customRangeQueries.fetch_add(1) == 0)

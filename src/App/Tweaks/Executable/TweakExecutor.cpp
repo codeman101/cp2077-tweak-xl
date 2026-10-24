@@ -51,7 +51,7 @@ void App::TweakExecutor::ExecuteTweaks()
             Red::DynArray<Red::CClass*> allClasses;
             m_rtti->GetClasses(nullptr, allClasses);
             MAC_DIAG("[selftest] R25 GetClasses(null base) returns %u classes, GetClasses(ScriptableTweak) returns %u (%s)\n",
-                     allClasses.size, tweakClasses.size, allClasses.size > 1000 && allClasses.size > tweakClasses.size ? "PASS" : "FAIL");
+                     allClasses.Size(), tweakClasses.Size(), allClasses.Size() > 1000 && allClasses.Size() > tweakClasses.Size() ? "PASS" : "FAIL");
             Red::CClass* base = s_scriptableTweakType;
             const auto expected = Red::CName("ScriptableTweak").hash;
             LogInfo("[diag] base ptr={} name={:x} expected={:x} isAbstract={} funcs={} count={}",
@@ -59,8 +59,8 @@ void App::TweakExecutor::ExecuteTweaks()
                     base ? base->name.hash : 0,
                     expected,
                     base ? static_cast<uint32_t>(base->flags.isAbstract) : 0u,
-                    base ? base->funcs.size : 0u,
-                    tweakClasses.size);
+                    base ? base->funcs.Size() : 0u,
+                    tweakClasses.Size());
             for (auto* tweakClass : tweakClasses)
             {
                 const auto* parent = tweakClass ? tweakClass->parent : nullptr;
@@ -71,8 +71,8 @@ void App::TweakExecutor::ExecuteTweaks()
                         tweakClass ? static_cast<uint32_t>(tweakClass->flags.isNative) : 0u,
                         static_cast<const void*>(parent),
                         parent ? parent->name.hash : 0,
-                        tweakClass ? tweakClass->funcs.size : 0u,
-                        tweakClass ? tweakClass->props.size : 0u);
+                        tweakClass ? tweakClass->funcs.Size() : 0u,
+                        tweakClass ? tweakClass->props.Size() : 0u);
             }
         }
 #endif
