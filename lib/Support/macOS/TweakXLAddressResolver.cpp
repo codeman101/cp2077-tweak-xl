@@ -103,6 +103,7 @@ void TweakXLAddressResolver::InitializeAddressTable()
     m_addressTable[1518341917] = 0x10C36A0;  // CClass_CreateInstance (rtti::ClassType::CreateObject)
     m_addressTable[404169501] = 0x1099fbc;   // CBaseFunction_InternalExecute
     m_addressTable[882511585] = 0x78300D8;   // CStack_vtbl (data: vptr value, slot 0)
+    m_addressTable[3689484881] = 0x10B0B44;  // ISerializable_sub_C0 (Mac vtable slot +0xC8, base of 6,482 vtables; 2.3.1 0x2186208). 2.5 calls it from the script context printer 0x11EF228
     m_addressTable[3791200470] = 0x1098FC0;  // CBaseFunction_ExecuteScripted (Gate 5 path)
     m_addressTable[3121353053] = 0x1025c8c;  // Handle_ctor (Gate 5 path)
     m_addressTable[961751128] = 0x9A5C940;   // OpcodeHandlers (data: handler table; Gate 5 path)
