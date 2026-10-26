@@ -1,4 +1,12 @@
 cmake_minimum_required(VERSION 3.20)
+# Portable build (default ON, macOS only): the dylib is built for macOS 15.5, the game's own minimum, and links fmt, spdlog and yaml-cpp statically
+# (macos/PortableDeps.cmake), so it needs nothing but the system libraries and runs on a Mac without Homebrew. -DCP2077_MAC_PORTABLE=OFF
+# gives the build that links Homebrew's shared libraries through @loader_path copies (macos/fix-install-names.sh) again. The deployment target is
+# a cache default, set before project(): -DCMAKE_OSX_DEPLOYMENT_TARGET=<version> overrides it.
+option(CP2077_MAC_PORTABLE "Build for distribution: deployment target 15.5, fmt/spdlog/yaml-cpp linked statically" ON)
+if(CP2077_MAC_PORTABLE AND CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "15.5" CACHE STRING "Minimum macOS version the dylib is built for")
+endif()
 # The version string is upstream's (xmake.lua set_version), so the Mac build reports what upstream's own build reports. It stays a literal here
 # because the everyday launcher reads it from this line; the check below keeps the two equal.
 project(TweakXL VERSION 1.11.4 LANGUAGES CXX)
@@ -126,8 +134,13 @@ if(NOT APPLE)
 endif()
 
 # Find external packages
-find_package(spdlog REQUIRED)
-find_package(yaml-cpp REQUIRED)
+if(APPLE AND CP2077_MAC_PORTABLE)
+    set(CP2077_PORTABLE_YAML_CPP ON)
+    include("${CMAKE_SOURCE_DIR}/macos/PortableDeps.cmake")
+else()
+    find_package(spdlog REQUIRED)
+    find_package(yaml-cpp REQUIRED)
+endif()
 
 # TiltedCore and hopscotch - for macOS, we need to provide these
 if(APPLE)
@@ -260,9 +273,12 @@ endif()
 if(APPLE)
     # R23: the plugin loads the copies of spdlog, fmt and yaml-cpp that sit next to it (@loader_path), and the build fails when one of its own
     # symbols is declared but not compiled in (-undefined dynamic_lookup would hide it until the first call).
-    add_custom_command(TARGET TweakXL POST_BUILD
-        COMMAND /bin/bash "${CMAKE_SOURCE_DIR}/macos/fix-install-names.sh" "$<TARGET_FILE:TweakXL>"
-        VERBATIM)
+    # (The portable build links nothing from Homebrew, so it has no install names to rewrite.)
+    if(NOT CP2077_MAC_PORTABLE)
+        add_custom_command(TARGET TweakXL POST_BUILD
+            COMMAND /bin/bash "${CMAKE_SOURCE_DIR}/macos/fix-install-names.sh" "$<TARGET_FILE:TweakXL>"
+            VERBATIM)
+    endif()
     add_custom_command(TARGET TweakXL POST_BUILD
         COMMAND /bin/bash "${CMAKE_SOURCE_DIR}/macos/check-undefined.sh" "$<TARGET_FILE:TweakXL>"
         VERBATIM)
